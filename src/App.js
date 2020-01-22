@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
@@ -25,18 +25,37 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function App() {
-  const [list, setList] = useState(LIST);
+  const localStorageList = localStorage.getItem('list', LIST).split(',');
+
+  const [list, setList] = useState(localStorageList);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(0);
   const classes = useStyles();
 
   const videoUrl = list.length
-    ? list[selected].url
+    ? list[selected]
     : 'https://www.youtube.com/watch?v=fySaWH6qIVg';
 
   const handleClickOpen = () => {
     setOpen(true);
   };
+
+  useEffect(() => {
+    window.addEventListener(
+      'storage',
+      storage => {
+        const list = localStorage.getItem('list');
+        setList(list.split(','));
+      },
+      false,
+    );
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('list', list);
+    window.dispatchEvent(new Event('storage'));
+    setList(list);
+  }, [list]);
 
   return (
     <div className="App">

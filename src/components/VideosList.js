@@ -13,8 +13,17 @@ import DeleteIcon from '@material-ui/icons/Delete';
 const useStyles = makeStyles(theme => ({
   list: {
     padding: 5,
-    maxHeight: '500px',
+    maxHeight: '600px',
     overflowY: 'scroll',
+  },
+  listItem: {
+    border: '1px solid',
+    margin: '5px 0px',
+    borderRadius: '10px',
+  },
+  listItemText: {
+    cursor: 'pointer',
+    wordBreak: 'break-word',
   },
   avatar: {
     cursor: 'pointer',
@@ -41,7 +50,8 @@ function VideosList({data, onListUpdate, setSelected}) {
       {data.map((item, index) => {
         return (
           <ListItem
-            key={item.id}
+            className={classes.listItem}
+            key={index}
             draggable
             onDragStart={e => {
               e.dataTransfer.setData('text/plain', index);
@@ -52,9 +62,6 @@ function VideosList({data, onListUpdate, setSelected}) {
             }}
             onDrop={e => {
               onDrop(e);
-            }}
-            style={{
-              border: '1px solid',
             }}
             onMouseEnter={() => {
               setHoverIndex(index);
@@ -67,7 +74,10 @@ function VideosList({data, onListUpdate, setSelected}) {
                 <DehazeIcon />
               </Avatar>
             </ListItemAvatar>
-            <ListItemText primary={item.id + '  ' + item.url} />
+            <ListItemText
+              className={classes.listItemText}
+              primary={index + '  ' + item}
+            />
             <ListItemSecondaryAction>
               {hoverIndex === index ? (
                 <IconButton

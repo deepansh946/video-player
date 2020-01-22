@@ -7,18 +7,19 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
+import {YOUTUBE_REGEX} from '../constants';
+
 function DialogBox({open, data, onUpdateList, setOpen}) {
   const [url, setUrl] = useState('');
 
   const handleAdd = url => {
-    const updatedList = [{id: data.length + 1, url, hover: false}, ...data];
+    const updatedList = [url, ...data];
     onUpdateList(updatedList);
     setUrl('');
   };
 
   const validateUrl = url => {
-    const regExp = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
-    const match = url.match(regExp);
+    const match = url.match(YOUTUBE_REGEX);
     if (url !== '' && match) {
       return match[1];
     }
