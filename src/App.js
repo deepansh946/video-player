@@ -62,6 +62,7 @@ function App() {
   }, []);
 
   useEffect(() => {
+    console.log(list);
     localStorage.setItem('list', list);
     window.dispatchEvent(new Event('storage'));
     setList(list);

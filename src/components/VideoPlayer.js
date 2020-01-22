@@ -14,7 +14,7 @@ const VideoPlayer = ({data, url, onComplete}) => {
       width="80%"
       height="500px"
       onEnded={() => {
-        const updatedList = data.filter(list => list.url !== url);
+        const updatedList = data.filter(item => item !== url);
         onComplete(updatedList);
       }}
     />
