@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import ReactPlayer from 'react-player';
 import {makeStyles} from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import List from '@material-ui/core/List';
@@ -13,12 +12,10 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import DehazeIcon from '@material-ui/icons/Dehaze';
 import DeleteIcon from '@material-ui/icons/Delete';
-import TextField from '@material-ui/core/TextField';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+
+import {LIST} from './constants';
+import VideoPlayer from './components/VideoPlayer';
+import DialogBox from './components/DialogBox';
 
 import './App.css';
 
@@ -49,48 +46,27 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const LIST = [
-  {
-    url: 'https://www.youtube.com/watch?v=Fkd9TWUtFm0',
-    hover: false,
-  },
-  {
-    url: 'https://www.youtube.com/watch?v=Rx8pfheh6aI',
-    hover: false,
-  },
-  {
-    url: 'https://www.youtube.com/watch?v=RSqy0jsGdoY',
-    hover: false,
-  },
-  {
-    url: 'https://www.youtube.com/watch?v=mA8pNpPvrr0',
-    hover: false,
-  },
-  {
-    url: 'https://www.youtube.com/watch?v=k7EqoT5YOqk',
-    hover: false,
-  },
-  {
-    url: 'https://www.youtube.com/watch?v=E9oKEJ1pXPw',
-    hover: false,
-  },
-  {
-    url: 'https://www.youtube.com/watch?v=n3kNlFMXslo',
-    hover: false,
-  },
-];
-
 function App() {
   const [list, setList] = useState(LIST);
+  const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(0);
   const [hoverIndex, setHoverIndex] = useState(null);
-  const [open, setOpen] = useState(false);
-  const [url, setUrl] = useState('');
+  const [endIndex, setEndIndex] = useState(-1);
 
   const classes = useStyles();
   const videoUrl = list.length
     ? list[selected].url
     : 'https://www.youtube.com/watch?v=fySaWH6qIVg';
+
+  const onDrop = e => {
+    const idx = e.dataTransfer.getData('text');
+    console.log('Dropped at', endIndex, ' from ', idx);
+    let tempList = list;
+    const tempValue = tempList[endIndex];
+    tempList[endIndex] = tempList[idx];
+    tempList[idx] = tempValue;
+    setList([...tempList]);
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -98,11 +74,6 @@ function App() {
 
   const handleClose = () => {
     setOpen(false);
-  };
-
-  const handleAdd = url => {
-    const updatedList = [{url, hover: false}, ...list];
-    setList(updatedList);
   };
 
   const validateUrl = url => {
@@ -120,23 +91,10 @@ function App() {
 
       <Grid container spacing={2}>
         <Grid item xs={12} md={8} className={classes.item}>
-          <ReactPlayer
+          <VideoPlayer
+            data={list}
             url={videoUrl}
-            playing
-            controls
-            muted
-            style={{
-              margin: '0 auto',
-            }}
-            width="80%"
-            height="500px"
-            onDuration={duration => {
-              console.log(duration);
-            }}
-            onEnded={() => {
-              const updatedList = list.filter(list => list.url !== videoUrl);
-              setList(updatedList);
-            }}
+            onComplete={list => setList(list)}
           />
         </Grid>
 
@@ -150,9 +108,17 @@ function App() {
               {list.map((item, index) => {
                 return (
                   <ListItem
-                    onDragEnter={() => console.log('drag enter')}
-                    onDragOver={() => console.log('onDragOver')}
-                    onDrop={() => console.log('drop')}
+                    draggable
+                    onDragStart={e => {
+                      e.dataTransfer.setData('text/plain', index);
+                    }}
+                    onDragOver={e => {
+                      e.preventDefault();
+                      setEndIndex(index);
+                    }}
+                    onDrop={e => {
+                      onDrop(e);
+                    }}
                     style={{
                       border: '1px solid',
                     }}
@@ -162,17 +128,12 @@ function App() {
                     onClick={() => {
                       setSelected(index);
                     }}>
-                    <ListItemAvatar
-                      draggable
-                      className={classes.avatar}
-                      onClick={() => {
-                        console.log('Reorder');
-                      }}>
+                    <ListItemAvatar className={classes.avatar}>
                       <Avatar>
                         <DehazeIcon />
                       </Avatar>
                     </ListItemAvatar>
-                    <ListItemText primary={item.url} />
+                    <ListItemText primary={item.id + '  ' + item.url} />
                     <ListItemSecondaryAction>
                       {hoverIndex === index ? (
                         <IconButton
@@ -199,44 +160,12 @@ function App() {
               onClick={handleClickOpen}>
               Add New
             </Button>
-
-            <Dialog
+            <DialogBox
               open={open}
-              onClose={handleClose}
-              aria-labelledby="form-dialog-title">
-              <DialogTitle id="form-dialog-title">Add New Video</DialogTitle>
-              <DialogContent>
-                <DialogContentText>
-                  Please paste the youtube url of your choice
-                </DialogContentText>
-                <TextField
-                  autoFocus
-                  error={!validateUrl(url)}
-                  margin="dense"
-                  id="url"
-                  label="URL"
-                  fullWidth
-                  onChange={e => {
-                    const {value} = e.target;
-                    setUrl(value);
-                  }}
-                />
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={handleClose} color="primary">
-                  Cancel
-                </Button>
-                <Button
-                  disabled={!validateUrl(url)}
-                  onClick={() => {
-                    handleAdd(url);
-                    setOpen(false);
-                  }}
-                  color="primary">
-                  Add
-                </Button>
-              </DialogActions>
-            </Dialog>
+              setOpen={setOpen}
+              data={list}
+              onUpdateList={list => setList(list)}
+            />
           </div>
         </Grid>
       </Grid>
