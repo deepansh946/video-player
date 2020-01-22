@@ -25,7 +25,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function App() {
-  const localStorageList = localStorage.getItem('list', LIST).split(',');
+  let localStorageList = localStorage.getItem('list');
+
+  if (localStorageList === null) {
+    localStorageList = LIST;
+  } else if (typeof localStorageList === 'string') {
+    localStorageList = localStorageList.split(',');
+  }
 
   const [list, setList] = useState(localStorageList);
   const [open, setOpen] = useState(false);
@@ -45,7 +51,11 @@ function App() {
       'storage',
       storage => {
         const list = localStorage.getItem('list');
-        setList(list.split(','));
+        if (list === null) {
+          setList(LIST);
+        } else {
+          setList(list.split(','));
+        }
       },
       false,
     );
