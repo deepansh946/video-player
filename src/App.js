@@ -13,7 +13,7 @@ import './App.css';
 
 const useStyles = makeStyles(theme => ({
   button: {
-    marginTop: '10px',
+    marginTop: '20px',
   },
   title: {
     textAlign: 'center',
@@ -41,7 +41,6 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">Video Player</header>
-
       <Grid container spacing={2}>
         <Grid item xs={12} md={8} className={classes.item}>
           <VideoPlayer
@@ -50,12 +49,10 @@ function App() {
             onComplete={list => setList(list)}
           />
         </Grid>
-
         <Grid item xs={12} md={4}>
           <Typography variant="h6" className={classes.title}>
             Playlist
           </Typography>
-
           <div>
             <VideosList
               data={list}
