@@ -32,5 +32,16 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "lint-staged": "^10.0.1"
+  },
+  “husky”: {
+    “hooks”: {
+      “pre-commit”: “lint-staged”
+    }
+  },
+  “lint-staged”: {
+    “*.js”: [“./node_modules/.bin/eslint — fix”, “git add”]
   }
 }

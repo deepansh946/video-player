@@ -13,6 +13,7 @@ function DialogBox({open, data, onUpdateList, setOpen}) {
   const handleAdd = url => {
     const updatedList = [{id: data.length + 1, url, hover: false}, ...data];
     onUpdateList(updatedList);
+    setUrl('');
   };
 
   const validateUrl = url => {
@@ -22,10 +23,6 @@ function DialogBox({open, data, onUpdateList, setOpen}) {
       return match[1];
     }
     return false;
-  };
-
-  const handleClickOpen = () => {
-    setOpen(true);
   };
 
   const handleClose = () => {
