@@ -32,12 +32,10 @@ const useStyles = makeStyles(theme => ({
 
 function VideosList({data, onListUpdate, setSelected}) {
   const [hoverIndex, setHoverIndex] = useState(null);
-  const [endIndex, setEndIndex] = useState(-1);
   const classes = useStyles();
 
-  const onDrop = e => {
+  const onDrop = (e, endIndex) => {
     const idx = e.dataTransfer.getData('text');
-    console.log('Dropped at', endIndex, ' from ', idx);
     let tempList = data;
     const tempValue = tempList[endIndex];
     tempList[endIndex] = tempList[idx];
@@ -58,10 +56,10 @@ function VideosList({data, onListUpdate, setSelected}) {
             }}
             onDragOver={e => {
               e.preventDefault();
-              setEndIndex(index);
+              return false;
             }}
             onDrop={e => {
-              onDrop(e);
+              onDrop(e, index);
             }}
             onMouseEnter={() => {
               setHoverIndex(index);
